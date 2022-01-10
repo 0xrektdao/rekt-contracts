@@ -5,21 +5,19 @@
 // Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
+const errorAndExit = (msg: string) => {
+  throw new Error(msg);
+};
+
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
-
-  // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
+  const root: string = process.env.MERKLE_ROOT!;
+  if (!root) {
+    errorAndExit("no merkle root, please provide one");
+  }
+  const RektToken = await ethers.getContractFactory("RektToken");
+  const token = await RektToken.deploy("RektToken", "REKT", 18, root);
+  await token.deployed();
+  console.log(`REKT token deployed at: ${token.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
